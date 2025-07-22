@@ -1,10 +1,10 @@
-import os
 import shutil
 
 from helpers.instadownloader import InstaDownloader
 from helpers.mealie_api import MealieAPI
 from helpers.config import load_config
 from flask import Flask, request, render_template
+
 
 def create_app(config):
     mealie_api = MealieAPI(config["MEALIE_URL"], config["MEALIE_API_KEY"])
@@ -51,6 +51,7 @@ def create_app(config):
 
 if __name__ == "__main__":
     from waitress import serve
+
     config = load_config()
     app = create_app(config)
     serve(app, host="0.0.0.0", port=config["HTTP_PORT"])

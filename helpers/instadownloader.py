@@ -8,8 +8,10 @@ from instaloader import Post, TwoFactorAuthRequiredException, BadCredentialsExce
 
 SESSION_FILE = "./session-file"
 
+
 class InstaDownloader:
     def __init__(self):
+        self._cookies = None
         self.loader = instaloader.Instaloader(download_comments=False,
                                               download_geotags=False,
                                               save_metadata=False,

@@ -1,6 +1,7 @@
 import os
 import dotenv
 
+
 def require(varname: str) -> str:
     val = os.getenv(varname)
     if not val:
