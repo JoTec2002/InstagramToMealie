@@ -5,7 +5,7 @@ import requests
 
 class MealieAPI:
     def __init__(self, url, key):
-        self.MEALIE_URL = url
+        self.MEALIE_URL = url.rstrip('/')
         self.API_KEY = key
         self.HEADERS = {
             "Authorization": f"Bearer {self.API_KEY}",

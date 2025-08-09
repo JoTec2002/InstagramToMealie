@@ -5,20 +5,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Instagram To Mealie Importer</title>
+    <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/normalize.css') }}">
+    <!-- http://getskeleton.com/ -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/skeleton.css') }}">
 </head>
 <body>
-<h1>Download Instagram Post/Reel</h1>
-{% if error %}
-<p style="color: red;">{{ error }}</p>
-{% endif %}
-<form method="POST">
-    <label for="url">Instagram URL:</label>
-    <input type="text" name="url" id="url" required>
-    <button type="submit">Import into Mealie</button>
-</form>
-
-{% if successful %}
-<p style="color: green;">Video successfully imported to Mealie</p>
-{% endif %}
+    <div class="container">
+        <h2 style="margin-top: 5vh;">Import recipe from Instagram Post/Reel into Mealie</h2>
+        {% if error %}
+        <p style="color: red;">{{ error }}</p>
+        {% endif %}
+        <form method="POST">
+            <div class="row">
+                <div class="twelve columns">
+                    <label for="url">Instagram URL:</label>
+                    <input class="u-full-width" type="text" name="url" id="url" required>
+                </div>
+            </div>
+            <div class="row">
+                <div class="six columns">
+                    <button class="button-primary" type="submit">Import into Mealie</button>
+                </div>
+            </div>
+        </form>
+        
+        {% if successful %}
+        <p style="color: green;">Video successfully imported to Mealie</p>
+        {% endif %}
+    </div>
 </body>
 </html>
