@@ -41,6 +41,7 @@ RUN python -m playwright install chromium
 COPY main.py /app/
 COPY templates /app/templates
 COPY helpers /app/helpers
+COPY static /app/static
 
 # Expose the Flask port
 EXPOSE 9001
