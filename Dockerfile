@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     ca-certificates \
     fonts-liberation \
+    fonts-unifont \
     libasound2 \
     libatk-bridge2.0-0 \
     libatk1.0-0 \
@@ -34,7 +35,7 @@ COPY requirements.txt /app/
 RUN pip install -r requirements.txt
 
 # Install Playwright and browser binaries
-RUN python -m playwright install --with-deps chromium
+RUN python -m playwright install chromium
 
 # Copy application code
 COPY main.py /app/
