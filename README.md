@@ -159,6 +159,14 @@ services:
 
 1. Open in Webbrowser (e.g. `http://instagramtomealie.my-server.com`) and just import the Instagram URL into the textfield
 2. Call from an automation (e.g. IOS shortcut) the url `http://instagramtomealie.my-server.com?url=<InstagramURL>`
+3. If you need an API which responds with the result of the import, use `POST http://instagramtomealie.my-server.com/api` sending the URL as either the request's body in JSON format (preferred, `{"url": "<InstagramURL>"}`) or as a query param (see previous bullet point). The API responds a JSON in the format:
+```json
+{
+  "recipe_slug": <imported recipe slug>,
+  "error": <error message if any error>,
+  "url": <Instagram URL which was imported>
+}
+```
 
 ### Configuration
 
