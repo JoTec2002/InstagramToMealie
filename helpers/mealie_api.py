@@ -42,7 +42,7 @@ class MealieAPI:
             raise Exception(
                 f"Error while getting recipe from API! - Status Code: {response.status_code} - Response: {response.text}")
 
-    def create_recipe_from_html(self, html_content) -> str:
+    def create_recipe_from_html(self, html_content: str) -> str:
         include_tags = True
         if "MEALIE_USE_INSTAGRAM_TAGS" in os.environ:
             if os.environ.get("MEALIE_USE_INSTAGRAM_TAGS").lower() == "false":

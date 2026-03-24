@@ -20,7 +20,10 @@ def create_app(config):
             post = downloader.download_instagram_post(url)
             filepath = "downloads/" + post.shortcode + "/"
 
-            recipe_slug = mealie_api.create_recipe_from_html(post.caption)
+            post_caption = post.caption
+            if not isinstance(post_caption, str):
+                raise TypeError(f"Expected str, got {type(post_caption).__name__}, value: {post_caption}")
+            recipe_slug = mealie_api.create_recipe_from_html(post_caption)
 
             mealie_api.update_recipe_orig_url(recipe_slug, url)
             image_file = filepath + post.date.strftime(format="%Y-%m-%d_%H-%M-%S_UTC") + ".jpg"
@@ -28,7 +31,7 @@ def create_app(config):
             if post.is_video:
                 video_file = filepath + post.date.strftime(format="%Y-%m-%d_%H-%M-%S_UTC") + ".mp4"
                 mealie_api.upload_recipe_asset(recipe_slug, video_file)
-            
+
             shutil.rmtree(filepath)
 
             return recipe_slug, ""
@@ -38,12 +41,12 @@ def create_app(config):
             if filepath:
                 shutil.rmtree(filepath)
             return False, repr(e)
-        
+
     def execute_download_and_render_view(url):
         recipe_slug, error = execute_download(url)
 
         return render_template("index.html", successful=recipe_slug, error=error)
-    
+
     @app.route("/", methods=["GET", "POST"])
     def index():
         if request.method == "POST":
@@ -69,8 +72,9 @@ def create_app(config):
             url = request.args.get('url')
 
         if not url:
-            return jsonify({"error": "URL was not provided. Please inform the url as query parameter or in the JSON body."}), 400
-        
+            return jsonify(
+                {"error": "URL was not provided. Please inform the url as query parameter or in the JSON body."}), 400
+
         recipe_slug, error = execute_download(url)
 
         return jsonify({
