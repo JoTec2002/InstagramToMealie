@@ -23,7 +23,7 @@
     {
       "matchDepTypes": ["devDependencies"],
       "prPriority": -2
-    },
+    }
   ],
   "vulnerabilityAlerts": {
     "enabled": true,
