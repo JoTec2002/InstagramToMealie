@@ -1,0 +1,44 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:best-practices"
+  ],
+  "updateNotScheduled": false,
+  "internalChecksFilter": "strict",
+  "minimumReleaseAge": "14 days",
+  "timezone": "Europe/Berlin",
+  "gitAuthor": "Renovate Bot <bot@renovateapp.com>",
+  "labels": [
+    "dependencies"
+  ],
+  "commitMessagePrefix": "chore(deps):",
+  "major": {
+    "dependencyDashboardApproval": true
+  },
+  "packageRules": [
+    {
+      "matchDepTypes": ["dependencies"],
+      "prPriority": 5
+    },
+    {
+      "matchDepTypes": ["devDependencies"],
+      "prPriority": -2
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": [
+      "security",
+      "vulnerability"
+    ],
+    "dependencyDashboardApproval": false,
+    "minimumReleaseAge": "1 days",
+    "prCreation": "immediate",
+    "schedule": [
+      "at any time"
+    ],
+    "vulnerabilityFixStrategy": "lowest"
+  },
+  "osvVulnerabilityAlerts": true,
+  "dependencyDashboardOSVVulnerabilitySummary": "all"
+}
