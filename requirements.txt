@@ -14,7 +14,7 @@ playwright==1.59.0
 pyee==13.0.1
 pyotp==2.9.0
 python-dotenv==1.2.2
-requests==2.33.1
+requests==2.34.0
 typing_extensions==4.15.0
 urllib3==2.7.0
 waitress==3.0.2
