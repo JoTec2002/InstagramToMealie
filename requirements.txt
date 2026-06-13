@@ -5,7 +5,7 @@ click==8.4.1
 colorama==0.4.6
 Flask==3.1.3
 greenlet==3.5.1
-idna==3.16
+idna==3.17
 instaloader==4.15.1
 itsdangerous==2.2.0
 Jinja2==3.1.6
