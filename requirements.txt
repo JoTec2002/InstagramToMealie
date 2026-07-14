@@ -10,7 +10,7 @@ instaloader==4.15.1
 itsdangerous==2.2.0
 Jinja2==3.1.6
 MarkupSafe==3.0.3
-playwright==1.60.0
+playwright==1.61.0
 pyee==13.0.1
 pyotp==2.10.0
 python-dotenv==1.2.2
