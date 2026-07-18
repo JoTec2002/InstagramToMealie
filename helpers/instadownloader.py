@@ -91,3 +91,4 @@ class InstaDownloader:
             return post
         except Exception as e:
             print(f"Error downloading post: {e}")
+            raise e
