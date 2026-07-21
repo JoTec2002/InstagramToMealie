@@ -23,6 +23,7 @@ A simple little converter, that imports an instagram URL into mealie
     - [Installation](#installation)
     - [Usage](#usage)
     - [Configuration](#configuration)
+    - [Compatibility notes](#compatibility-notes)
 - [Contributing](#contributing)
 - [License](#license)
 - [Acknowledgments](#acknowledgments)
@@ -180,6 +181,19 @@ INSTA_PWD:                           # Instagram password in plaintext, optional
 INSTA_TOTP_SECRET:                   # Secret key used for 2FA authentication, optional, not recommended.
 HTTP_PORT:                           # Port to use for the Flask HTTP server, optional, default 9001
 ```
+
+### Compatibility notes
+
+- Instagram currently requires an unreleased Instaloader fix. The dependency is temporarily pinned to
+  [Instaloader PR #2706](https://github.com/instaloader/instaloader/pull/2706) at a tested commit and should be
+  moved back to a regular release as soon as that fix is published.
+- Some Mealie versions, including 3.20.1, reject MP4 recipe assets. InstagramToMealie skips only that specific
+  `400 Unsupported file extension` response so the recipe and cover image can still be imported. Other asset
+  upload errors remain fatal.
+- Small or local OpenAI-compatible models may wrap or format the extracted recipe in a way Mealie cannot parse.
+  A tested strict prompt is available at
+  [`examples/mealie-prompts/recipes/scrape-recipe.txt`](examples/mealie-prompts/recipes/scrape-recipe.txt). Copy it
+  below Mealie's data directory and set `OPENAI_CUSTOM_PROMPT_DIR=/app/data/openai-prompts` on the Mealie service.
 
 ---
 

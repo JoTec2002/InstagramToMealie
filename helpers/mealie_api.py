@@ -92,20 +92,31 @@ class MealieAPI:
                 f"Error while uploading Image to API! - Status Code: {response.status_code} - Response: {response.text}")
 
     def upload_recipe_asset(self, recipe_slug, recipe_asset) -> str:
-        files = {
-            'file': open(recipe_asset, 'rb')
-        }
         data = {
             'extension': recipe_asset.split('.')[-1],
             'icon': "mdi-file-image",
             'name': recipe_slug + "_video"
         }
-        response = requests.post(f"{self.MEALIE_URL}/api/recipes/{recipe_slug}/assets", files=files, data=data,
-                                 headers=self.HEADERS)
+        with open(recipe_asset, 'rb') as asset_file:
+            files = {
+                'file': asset_file
+            }
+            response = requests.post(f"{self.MEALIE_URL}/api/recipes/{recipe_slug}/assets", files=files, data=data,
+                                     headers=self.HEADERS)
 
         if response.status_code == 200:
             print(f"Added video asset")
             return response.json()
-        else:
-            raise Exception(
-                f"Error while uploading Video Asset to API! - Status Code: {response.status_code} - Response: {response.text}")
+
+        if response.status_code == 400:
+            try:
+                detail = response.json().get("detail")
+            except (AttributeError, ValueError):
+                detail = None
+
+            if detail == "Unsupported file extension":
+                print("Skipped video asset: this Mealie version does not accept MP4 recipe assets")
+                return ""
+
+        raise Exception(
+            f"Error while uploading Video Asset to API! - Status Code: {response.status_code} - Response: {response.text}")
