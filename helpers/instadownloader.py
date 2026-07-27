@@ -66,7 +66,7 @@ class InstaDownloader:
             browser.close()
             return final_url
 
-    def download_instagram_post(self, url) -> Post | None:
+    def download_instagram_post(self, url) -> Post:
         # Check if we got a deep share link first
         if '/share/' in url:
             print("Got a deep share link, resolving...")
@@ -76,10 +76,9 @@ class InstaDownloader:
             resolved_url = url
 
         # Validate and extract shortcode from the URL
-        match = re.search(r'(https?://)?(www\.)?instagram\.com/(p|reel|tv)/([A-Za-z0-9_-]+)', resolved_url)
+        match = re.search(r'(https?://)?(www\.)?instagram\.com/(p|reels?|tv)/([A-Za-z0-9_-]+)', resolved_url)
         if not match:
-            print(f"Received invalid Instagram URL ({resolved_url}). Please make sure it is a post, reel, or IGTV URL.")
-            return None
+            raise ValueError(f"Invalid Instagram URL: {resolved_url}. Expected a post, reel, reels, or IGTV URL.")
 
         shortcode = match.group(4)  # Extract the shortcode from the URL
 
