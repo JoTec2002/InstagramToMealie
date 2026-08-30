@@ -13,7 +13,7 @@ MarkupSafe==3.0.3
 playwright==1.62.0
 pyee==13.0.1
 pyotp==2.10.0
-python-dotenv==1.2.2
+python-dotenv==1.2.3
 requests==2.34.2
 typing_extensions==4.16.0
 urllib3==2.7.0
