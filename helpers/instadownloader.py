@@ -3,10 +3,31 @@ import os
 import re
 import instaloader
 import pyotp
+from urllib.parse import urlparse
 from playwright import sync_api
 from instaloader import Post, TwoFactorAuthRequiredException, BadCredentialsException
 
 SESSION_FILE = "./session-file"
+ALLOWED_SHARE_HOSTS = {"instagram.com", "www.instagram.com"}
+
+
+def is_valid_instagram_share_url(url: str) -> bool:
+    """Reject anything that isn't a genuine https://(www.)instagram.com/share/... URL.
+
+    Prevents SSRF/local-file-read via Playwright's page.goto(), which a plain
+    substring check on '/share/' does not (e.g. file:///path/share/../secret
+    or http://internal-host/x/share/y would previously pass).
+    """
+    try:
+        parsed = urlparse(url)
+    except ValueError:
+        return False
+    return (
+        parsed.scheme == "https"
+        and parsed.hostname is not None
+        and parsed.hostname.lower() in ALLOWED_SHARE_HOSTS
+        and "/share/" in parsed.path
+    )
 
 
 class InstaDownloader:
@@ -69,6 +90,9 @@ class InstaDownloader:
     def download_instagram_post(self, url) -> Post | None:
         # Check if we got a deep share link first
         if '/share/' in url:
+            if not is_valid_instagram_share_url(url):
+                print(f"Rejected invalid Instagram share URL ({url}). Only https://(www.)instagram.com/share/... links are accepted.")
+                return None
             print("Got a deep share link, resolving...")
             self.get_cookies()
             resolved_url = self.resolve_share_link(url)
