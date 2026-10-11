@@ -10,21 +10,12 @@ class MealieAPI:
         self.HEADERS = {
             "Authorization": f"Bearer {self.API_KEY}",
         }
-        self.get_user_self()  # Test if connection to Mealie is valid
 
-    def get_user_self(self) -> bool:
-        # Check connection and authentication data
-        print(f"\nChecking connection and validating auth data...")
-
-        response = requests.get(f"{self.MEALIE_URL}/api/users/self", headers=self.HEADERS)
-
-        if response.status_code == 200:
-            print(f"\nConnection established! Auth data validated! - Status Code: {response.status_code}")
-            return True
-        else:
-            print(
-                f"\nError while connecting to your Mealie API! - Status Code: {response.status_code}, Response: {response.text}")
-            return False
+    def get_user_self(self) -> dict:
+        # Raises requests.HTTPError on a non-2xx answer, e.g. 401 for an invalid API key
+        response = requests.get(f"{self.MEALIE_URL}/api/users/self", headers=self.HEADERS, timeout=10)
+        response.raise_for_status()
+        return response.json()
 
     def __get_recipe(self, recipe_id) -> dict:
         response = requests.get(f"{self.MEALIE_URL}/api/recipes/{recipe_id}", headers=self.HEADERS)

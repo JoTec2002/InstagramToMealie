@@ -13,26 +13,174 @@
 <body>
     <div class="container">
         <h2 style="margin-top: 5vh;">Import recipe from Instagram Post/Reel into Mealie</h2>
-        {% if error %}
-        <p style="color: red;">{{ error }}</p>
-        {% endif %}
-        <form method="POST">
+
+        <div id="logged-in" hidden>
+            <p>
+                Logged in to Mealie<span id="username-wrapper" hidden> as <strong id="username"></strong></span>
+                {% if not server_auth %}
+                <button type="button" id="logoff" style="margin: 0 0 0 1rem;">Log off</button>
+                {% endif %}
+            </p>
+        </div>
+        {% if not server_auth %}
+        <form id="login-form" hidden>
             <div class="row">
                 <div class="twelve columns">
-                    <label for="url">Instagram URL:</label>
-                    <input class="u-full-width" type="text" name="url" id="url" required>
+                    <label for="api-key">Mealie API key:</label>
+                    <input class="u-full-width" type="password" id="api-key" autocomplete="off" required>
                 </div>
             </div>
             <div class="row">
                 <div class="six columns">
-                    <button class="button-primary" type="submit">Import into Mealie</button>
+                    <button type="submit" id="authenticate">Authenticate</button>
                 </div>
             </div>
         </form>
-        
+        {% endif %}
+        <p id="auth-error" style="color: red;" hidden></p>
+
+        {% if error %}
+        <p style="color: red;">{{ error }}</p>
+        {% endif %}
+        <form method="POST" id="import-form">
+            {% if not server_auth %}
+            <input type="hidden" name="api_key" id="import-api-key">
+            {% endif %}
+            <div class="row">
+                <div class="twelve columns">
+                    <label for="url">Instagram URL:</label>
+                    <input class="u-full-width" type="text" name="url" id="url" value="{{ url or '' }}" required>
+                </div>
+            </div>
+            <div class="row">
+                <div class="six columns">
+                    <button class="button-primary" type="submit" id="import">Import into Mealie</button>
+                </div>
+            </div>
+        </form>
+
         {% if successful %}
         <p style="color: green;">Video successfully imported to Mealie</p>
         {% endif %}
     </div>
+
+    <script>
+        const SERVER_AUTH = {{ server_auth|tojson }};
+        const AUTO_SUBMIT = {{ (auto_submit or false)|tojson }};
+        const USER_ENDPOINT = {{ url_for('user')|tojson }};
+        const STORAGE_KEY = "mealieApiKey";
+
+        const loggedIn = document.getElementById("logged-in");
+        const usernameWrapper = document.getElementById("username-wrapper");
+        const usernameText = document.getElementById("username");
+        const loginForm = document.getElementById("login-form");
+        const apiKeyInput = document.getElementById("api-key");
+        const authenticateButton = document.getElementById("authenticate");
+        const logoffButton = document.getElementById("logoff");
+        const authError = document.getElementById("auth-error");
+        const importForm = document.getElementById("import-form");
+        const importApiKey = document.getElementById("import-api-key");
+        const importButton = document.getElementById("import");
+
+        function showAuthError(message) {
+            authError.textContent = message || "";
+            authError.hidden = !message;
+        }
+
+        function showLoggedIn(username, error) {
+            usernameText.textContent = username || "";
+            usernameWrapper.hidden = !username;
+            loggedIn.hidden = false;
+            if (loginForm) loginForm.hidden = true;
+            importButton.disabled = false;
+            showAuthError(error);
+        }
+
+        function showLogin(error) {
+            loggedIn.hidden = true;
+            loginForm.hidden = false;
+            importButton.disabled = true;
+            showAuthError(error);
+        }
+
+        async function fetchUsername(apiKey) {
+            const response = await fetch(USER_ENDPOINT, {
+                headers: apiKey ? {"Authorization": "Bearer " + apiKey} : {}
+            });
+            const body = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                const error = new Error(body.error || "Request failed with status " + response.status);
+                error.status = response.status;
+                throw error;
+            }
+            return body.username;
+        }
+
+        async function init() {
+            if (SERVER_AUTH) {
+                // The server's own API key is in use, the username is only informative
+                try {
+                    showLoggedIn(await fetchUsername());
+                } catch (e) {
+                    showLoggedIn(null, "Could not fetch Mealie user: " + e.message);
+                }
+                return;
+            }
+
+            const apiKey = localStorage.getItem(STORAGE_KEY);
+            if (!apiKey) {
+                showLogin();
+                return;
+            }
+
+            try {
+                showLoggedIn(await fetchUsername(apiKey));
+            } catch (e) {
+                if (e.status === 401) {
+                    localStorage.removeItem(STORAGE_KEY);
+                    showLogin("The stored Mealie API key is no longer valid. Please authenticate again.");
+                } else {
+                    // Mealie may just be unreachable right now, so keep the key
+                    showLoggedIn(null, "Could not fetch Mealie user: " + e.message);
+                }
+                return;
+            }
+
+            if (AUTO_SUBMIT) {
+                importForm.requestSubmit();
+            }
+        }
+
+        if (!SERVER_AUTH) {
+            importButton.disabled = true;
+
+            loginForm.addEventListener("submit", async (event) => {
+                event.preventDefault();
+                const apiKey = apiKeyInput.value.trim();
+                authenticateButton.disabled = true;
+                try {
+                    const username = await fetchUsername(apiKey);
+                    localStorage.setItem(STORAGE_KEY, apiKey);
+                    apiKeyInput.value = "";
+                    showLoggedIn(username);
+                } catch (e) {
+                    showLogin(e.message);
+                } finally {
+                    authenticateButton.disabled = false;
+                }
+            });
+
+            logoffButton.addEventListener("click", () => {
+                localStorage.removeItem(STORAGE_KEY);
+                showLogin();
+            });
+
+            importForm.addEventListener("submit", () => {
+                importApiKey.value = localStorage.getItem(STORAGE_KEY) || "";
+            });
+        }
+
+        init();
+    </script>
 </body>
 </html>
