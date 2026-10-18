@@ -41,7 +41,7 @@ create a new recipe with an associated image or video assets.
 ### Prerequisites
 
 1. Make sure you have OpenAI / Ollama configured in Mealie by navigating to `/admin/debug/openai` on your Mealie instance. This project doesn't integrate directly with OpenAI / Ollama, but needs it to be configured in Mealie to work properly. I personally got the best results with `qwen2.5:7b` as the Ollama Model.
-2. Generate a Mealie API Key (`/user/profile/api-tokens`). [Mealie Docs](https://docs.mealie.io/documentation/getting-started/api-usage/)
+2. Generate a Mealie API Key (`/user/profile/api-tokens`). [Mealie Docs](https://docs.mealie.io/documentation/getting-started/api-usage/) You can set it in the `MEALIE_API_KEY` environment variable, or leave that out and let each user log in with their own key in the web UI.
 3. Generate a Instagram Session File (!thats the most tricky step). A [helper script](https://raw.githubusercontent.com/JoTec2002/InstagramToMealie/refs/heads/main/helpers/instaloader_login_helper.py) is provided in this repo! It's just
    copied from the [Instaloader Docs](https://instaloader.github.io/troubleshooting.html).
     1. Download the script: [https://raw.githubusercontent.com/JoTec2002/InstagramToMealie/refs/heads/main/helpers/instaloader_login_helper.py](https://raw.githubusercontent.com/JoTec2002/InstagramToMealie/refs/heads/main/helpers/instaloader_login_helper.py)
@@ -100,7 +100,7 @@ services:
       - 9001:9001
     environment:
       INSTA_USER: "instagram username"
-      MEALIE_API_KEY: "MEALIE API KEY"
+      MEALIE_API_KEY: "MEALIE API KEY"            # Optional, users log in from the web UI if omitted
       MEALIE_URL: "YOU LOCAL MEALIE INSTALLATION" # e.g http://mealie:9000
       MEALIE_OPENAI_REQUEST_TIMEOUT: 60           # Optional, default: 60
     volumes:
@@ -130,7 +130,7 @@ services:
     environment:
       INSTA_USER: "instagram username"
       INSTA_PWD: "Cleartext Instagram password"
-      MEALIE_API_KEY: "MEALIE API KEY"
+      MEALIE_API_KEY: "MEALIE API KEY"            # Optional, users log in from the web UI if omitted
       MEALIE_URL: "YOU LOCAL MEALIE INSTALLATION" # e.g http://mealie:9000
       MEALIE_OPENAI_REQUEST_TIMEOUT: 60           # Optional, default: 60
       MEALIE_USE_INSTAGRAM_TAGS: true
@@ -168,11 +168,17 @@ services:
 }
 ```
 
+#### Authentication without `MEALIE_API_KEY`
+
+When `MEALIE_API_KEY` is not set, the web UI asks for a Mealie API key and checks it against Mealie before accepting it. The key is stored in the browser's local storage, with no expiration, until you click "Log off". Opening `?url=<InstagramURL>` in a browser that is already logged in imports the post right away; otherwise the URL is kept in the textfield until you log in.
+
+Clients calling the `POST /api` endpoint need to send their own key in the `Authorization: Bearer <Mealie API key>` header. When `MEALIE_API_KEY` is set, it is always used and the header is ignored.
+
 ### Configuration
 
 ```env
 MEALIE_URL:                          # Full URL of your Mealie instance (e.g http://mealie:9000, http://192.168.1.2:9000, http://my-mealie.com), required.
-MEALIE_API_KEY:                      # API key used to authenticate with the Mealie REST API, required.
+MEALIE_API_KEY:                      # API key used to authenticate with the Mealie REST API, optional. If not set, users log in with their own key in the web UI.
 MEALIE_OPENAI_REQUEST_TIMEOUT: 60    # The timeout in seconds for OpenAI / Ollama requests, optional, default 60.
 MEALIE_USE_INSTAGRAM_TAGS: true      # Embeds tags provided on the Instagram post as tags in Mealie, optional, default true.
 INSTA_USER:                          # Instagram username (e.g mob_kitchen), required.
