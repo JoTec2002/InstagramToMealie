@@ -8,7 +8,7 @@ services:
       - 9001:9001
     environment:
       INSTA_USER: "instagram username"
-      MEALIE_API_KEY: "MEALIE API KEY"
+      MEALIE_API_KEY: "MEALIE API KEY" # Optional, users log in from the web UI if omitted
       MEALIE_URL: "YOU LOCAL MEALIE INSTALLATION"
       MEALIE_OPENAI_REQUEST_TIMEOUT: 360
     volumes:

@@ -14,7 +14,7 @@ def load_config() -> dict:
 
     config = {
         "MEALIE_URL": require("MEALIE_URL"),
-        "MEALIE_API_KEY": require("MEALIE_API_KEY"),
+        "MEALIE_API_KEY": os.getenv("MEALIE_API_KEY"),
         "INSTA_USER": require("INSTA_USER"),
         "INSTA_PWD": os.getenv("INSTA_PWD"),
         "INSTA_TOTP_SECRET": os.getenv("INSTA_TOTP_SECRET"),
